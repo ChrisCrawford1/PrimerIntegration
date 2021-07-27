@@ -1,6 +1,6 @@
 <template>
   <div class="home">
-    <img alt="Vue logo" src="../assets/primer_full.png" style="height:200px margin-bottom:35px">
+    <img alt="Primer Logo" src="../assets/primer_full.png" style="height:200px margin-bottom:35px">
     <PrimerStore/>
   </div>
 </template>

@@ -9,7 +9,7 @@ router.post('/create', async (req, res) => {
     const paymentUrl = process.env.SANDBOX_API + "/payments";
 
     const config = {
-        headers: { "X-API-KEY": process.env.PRIMER_API_KEY}
+        headers: { "X-API-KEY": process.env.PRIMER_API_KEY }
     };
 
     const payload = {
@@ -22,13 +22,16 @@ router.post('/create', async (req, res) => {
         statementDescriptor: req.body.statement
     }
 
-    axios.post(paymentUrl, payload, config)
-    .then((response) => {
+    try {
+        let response = await axios.post(paymentUrl, payload, config);
         res.send(response.data);
-    }).catch(error => {
-        console.log('Error ' + JSON.stringify(error.response.data));
-        res.send(error);
-    })
+    } catch (error) {
+        res.send(error)
+    }
+});
+
+router.post('/capture', async (req, res) => {
+    
 });
 
 

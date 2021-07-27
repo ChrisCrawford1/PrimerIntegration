@@ -2,7 +2,7 @@
     <div class="card">
         <img :src="require('../assets/' + image_name)" :alt="alt" style="width:50%">
         <h1>{{ name }}</h1>
-        <p class="price">£{{ price }}</p>
+        <p class="price">{{currencySymbol}} {{ price }}</p>
         <p>{{ blurb }}</p>
         <p>
             <button @click="updateCart">Add To Cart</button>
@@ -14,15 +14,22 @@
 
 export default {
   name: 'Product',
-  props:['image_name', 'name', 'price', 'blurb', 'alt'],
+  props:['image_name', 'name', 'price', 'blurb', 'alt', 'currency'],
   emits: ['addToCart'],
-  data: function () {
-    return {
-
-    }
+  computed: {
+      currencySymbol() {
+          switch (this.currency) {
+              case "GBP":
+                  return "£";
+              case "EUR":
+                  return "€";
+              case "USD": 
+                  return "$";
+              default:
+                  return "£";
+          }
+      }
   },
-
-
   methods: {
       updateCart() {
           const item = {
