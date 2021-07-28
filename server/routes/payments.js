@@ -20,17 +20,34 @@ router.post('/create', async (req, res) => {
             token: req.body.token
         },
         statementDescriptor: req.body.statement
-    }
+    };
 
     try {
         let response = await axios.post(paymentUrl, payload, config);
         res.send(response.data);
     } catch (error) {
-        res.send(error)
+        res.send(error);
     }
 });
 
 router.post('/capture', async (req, res) => {
+    const paymentId = req.body.id;
+    const captureUrl = process.env.SANDBOX_API + `/payments/${paymentId}/capture`;
+
+    const config = {
+        headers: { "X-API-KEY": process.env.PRIMER_API_KEY }
+    };
+
+    const payload = {
+        amount: req.body.amount
+    };
+
+    try {
+        let response = await axios.post(captureUrl, payload, config);
+        res.send(response.data);
+    } catch (error) {
+        res.send(error);
+    }
     
 });
 
