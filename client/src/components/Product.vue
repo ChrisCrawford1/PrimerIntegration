@@ -11,23 +11,15 @@
 </template>
 
 <script>
-
+import { currencyHelper } from '../mixins/CurrencyMixin';
 export default {
   name: 'Product',
   props:['image_name', 'name', 'price', 'blurb', 'alt', 'currency'],
   emits: ['addToCart'],
+  mixins: [currencyHelper],
   computed: {
       currencySymbol() {
-          switch (this.currency) {
-              case "GBP":
-                  return "£";
-              case "EUR":
-                  return "€";
-              case "USD": 
-                  return "$";
-              default:
-                  return "£";
-          }
+          return currencyHelper.methods.currencySymbol(this.currency);
       }
   },
   methods: {

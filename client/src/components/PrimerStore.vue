@@ -1,6 +1,5 @@
 <template>
-  <div class="hello">
-
+  <div>
     <span>Currency: </span>
     <select name="currencySelector" id="currencySelector" v-model="currency">
       <option value="GBP" selected>GBP</option>
@@ -8,6 +7,9 @@
       <option value="USD">USD</option>
     </select>
 
+    <p v-if="totalAmount > 0">
+      Total Order {{currencySymbol}}{{totalAmount / 100}}
+    </p>
     <div class="grid-container">
       <div class="grid-child">
         <div class="grid-container">
@@ -34,7 +36,7 @@
       </div>
 
       <!-- Will only render if items are in the cart -->
-      <div class="grid-child green">
+      <div class="grid-child">
         <div class="parent-checkout">
           <div class="checkout-container" id="checkout-container"></div>
         </div>
@@ -47,10 +49,11 @@
 import axios from 'axios';
 import { loadPrimer } from "@primer-io/checkout-web";
 import Product from './Product.vue';
+import { currencyHelper } from '../mixins/CurrencyMixin';
 
 export default {
   name: 'PrimerStore',
-  mixins: [],
+  mixins: [currencyHelper],
   components: {
     "Product": Product,
   },
@@ -73,6 +76,9 @@ export default {
     authorizeUrl() {
       return this.baseUrl + '/payments/create';
     },
+    captureUrl() {
+      return this.baseUrl + '/payments/capture';
+    },
     totalAmount() {
       let total = 0;
 
@@ -80,6 +86,9 @@ export default {
         total += item.amount;
       });
       return total * 100;
+    },
+    currencySymbol() {
+      return currencyHelper.methods.currencySymbol(this.currency);
     }
   },
 
@@ -105,11 +114,23 @@ export default {
         throw new Error(returnedData.lastPaymentError.processorMessage);
       }
 
+      if (returnedData.status === 'AUTHORIZED') {
+        try {
+          this.captureFunds(returnedData.id);
+        } catch (e) {
+          throw new Error(e);
+        }
+      }
+
       return response.data;
     },
 
-    processError(data) {
-      alert(data);
+    async captureFunds(id) {
+      const payload = {
+        id: id
+      };
+
+      return await axios.post(this.captureUrl, payload);
     },
 
     async initialiseCheckout() {
@@ -146,7 +167,11 @@ export default {
       } catch (error) {
         alert(error);
       }
-    }
+    },
+
+    processError(data) {
+      alert(data);
+    },
   },
 
   watch: {
